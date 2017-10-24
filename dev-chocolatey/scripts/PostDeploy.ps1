@@ -47,9 +47,9 @@ Invoke-Command -ScriptBlock {refreshenv} -ComputerName $env:COMPUTERNAME -Creden
 Invoke-Command -ScriptBlock {npm install -g bower} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {npm install -g grunt-cli} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {Copy-Item C:\Python27\python.exe C:\Python27\python2.exe} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {New-Item c:\PartsUnlimitedAM -type directory -force} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {Set-Location C:\PartsUnlimitedAM\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {git clone https://github.com/Microsoft/PartsUnlimited.git C:\PartsUnlimitedAM\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {New-Item c:\PartsUnlimitedHOL -type directory -force} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {CD C:\PartsUnlimitedHOL\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {git clone https://github.com/Microsoft/PartsUnlimited.git C:\PartsUnlimitedHOL\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 
 Disable-PSRemoting -Force
