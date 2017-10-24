@@ -48,7 +48,7 @@ Invoke-Command -ScriptBlock {npm install -g bower} -ComputerName $env:COMPUTERNA
 Invoke-Command -ScriptBlock {npm install -g grunt-cli} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 Invoke-Command -ScriptBlock {Copy-Item C:\Python27\python.exe C:\Python27\python3.exe} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 Invoke-Command -ScriptBlock {Set-Location C:\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
-Invoke-Command -ScriptBlock {npgit clone https://github.com/Microsoft/PartsUnlimited.git} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
+Invoke-Command -ScriptBlock {git clone https://github.com/Microsoft/PartsUnlimited.git} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 Invoke-Command -ScriptBlock {Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 
 Disable-PSRemoting -Force
