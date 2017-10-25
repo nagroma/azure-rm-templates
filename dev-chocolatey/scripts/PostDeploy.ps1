@@ -36,8 +36,8 @@ $AddedLocation ="$env:userprofile\AppData\Roaming\npm"
 $Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment"
 $OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
 "OldPath: $OldPath" | Out-File $LogFile -Append
-$NewPath= $OldPath + ’;’ + $AddedLocation
-Set-ItemProperty -Path "$Reg" -Name PATH –Value $NewPath
+$NewPath= $OldPath + ';' + $AddedLocation
+Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath
 $UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
 "UpdatedPath: $UpdatedPath" | Out-File $LogFile -Append
 
