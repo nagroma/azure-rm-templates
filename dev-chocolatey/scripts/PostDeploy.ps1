@@ -1,6 +1,8 @@
-param([Parameter(Mandatory=$true)][string]$chocoPackages)
-param([Parameter(Mandatory=$true)][string]$vmAdminUserName)
-param([Parameter(Mandatory=$true)][string]$vmAdminPassword)
+params(
+    [Parameter(Mandatory=$true)][string]$chocoPackages),
+    [Parameter(Mandatory=$true)][string]$vmAdminUserName),
+    [Parameter(Mandatory=$true)][string]$vmAdminPassword
+    )
 
 cls
 
