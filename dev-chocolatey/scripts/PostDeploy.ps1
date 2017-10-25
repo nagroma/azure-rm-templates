@@ -5,67 +5,6 @@ Param(
     )
 
 cls
-
-New-Item "c:\choco" -type Directory -force | Out-Null
-$LogFile = "c:\choco\Script.log"
-$ChocoPackages | Out-File $LogFile -Append
-$VmAdminUserName | Out-File $LogFile -Append
-$VmAdminPassword | Out-File $LogFile -Append
-
-$secPassword = ConvertTo-SecureString $VmAdminPassword -AsPlainText -Force		
-$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($VmAdminUserName)", $secPassword)
-
-# Ensure that current process can run scripts. 
-"Enabling remoting" | Out-File $LogFile -Append
-Enable-PSRemoting -Force -SkipNetworkProfileCheck
-
-"Changing ExecutionPolicy" | Out-File $LogFile -Append
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-
-#"Install each Chocolatey Package"
-$ChocoPackages.Split(";") | ForEach {
-    $command = "cinst " + $_ + " -y -force"
-    $command | Out-File $LogFile -Append
-    $sb = [scriptblock]::Create("$command")
-
-    # Use the current user profile
-    Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
-}
-
-"Adding $env:userprofile\AppData\Roaming\npm to path" | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {
-    $AddedLocation ="$env:userprofile\AppData\Roaming\npm"
-    $Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment"
-    $OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
-    "OldPath: $OldPath" | Out-File $LogFile -Append
-    $NewPath= $OldPath + ';' + $AddedLocation
-    Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath
-    $UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
-    "UpdatedPath: $UpdatedPath" | Out-File $LogFile -Append
-} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-$slnPath = "C:\PartsUnlimitedHOL"
-
-Invoke-Command -ScriptBlock {refreshenv} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {npm install bower -g} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {npm install grunt-cli -g} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {Copy-Item C:\Python27\python.exe C:\Python27\python2.exe} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {New-Item $slnPath -type directory -force} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {CD $slnPath} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {git clone https://github.com/Microsoft/PartsUnlimited.git $slnPath\} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-#Invoke-Command -ScriptBlock {Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-
-#A few more settings that I like but are not required for the PartsUnlimitedHOL
-# Show file extensions (have to restart Explorer for this to take effect if run maually - Stop-Process -processName: Explorer -force)
-Invoke-Command -ScriptBlock {Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideFileExt -Value "0"} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-
-Invoke-Command -ScriptBlock {
-    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $false
-    Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse
-    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $true
-} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-
-Disable-PSRemoting -Force
-
 function buildVS 
 {
     param
@@ -97,3 +36,68 @@ function buildVS
         & "$($msBuildExe)" "$($path)" /t:Build /m
     }
 }
+
+New-Item "c:\choco" -type Directory -force | Out-Null
+$LogFile = "c:\choco\Script.log"
+$ChocoPackages | Out-File $LogFile -Append
+$VmAdminUserName | Out-File $LogFile -Append
+$VmAdminPassword | Out-File $LogFile -Append
+
+$secPassword = ConvertTo-SecureString $VmAdminPassword -AsPlainText -Force		
+$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($VmAdminUserName)", $secPassword)
+
+# Ensure that current process can run scripts. 
+"Enabling remoting" | Out-File $LogFile -Append
+Enable-PSRemoting -Force -SkipNetworkProfileCheck
+
+"Changing ExecutionPolicy" | Out-File $LogFile -Append
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+
+#"Install each Chocolatey Package"
+$ChocoPackages.Split(";") | ForEach {
+    $command = "cinst " + $_ + " -y -force"
+    $command | Out-File $LogFile -Append
+    $sb = [scriptblock]::Create("$command")
+
+    # Use the current user profile
+    Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
+}
+
+
+Invoke-Command -ScriptBlock {
+    $slnPath = "$env:userprofile\Desktop\PartsUnlimitedHOL"
+    "slnPath: $slnPath"
+    npm install bower -g
+    npm install grunt-cli -g
+    Copy-Item C:\Python27\python.exe C:\Python27\python2.exe
+    New-Item $slnPath -type directory -force
+    git clone https://github.com/Microsoft/PartsUnlimited.git $slnPath # The error message "CategoryInfo : NotSpecified: (Switched to branch..." is a documented issues but no workaround.  This still works fine.
+    #Sometimes the \AppData\Roaming\npm gets added to the path and some times it doesn't. This makes sure.
+    "Adding $env:userprofile\AppData\Roaming\npm to path"
+    $AddedLocation ="$env:userprofile\AppData\Roaming\npm"
+    $Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment"
+    $OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
+    "OldPath: $OldPath"
+    if(-Not $OldPath.Contains($AddedLocation)) {
+        $NewPath= $OldPath + ';' + $AddedLocation
+        Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath
+        $UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
+        "UpdatedPath: $UpdatedPath"
+    }
+
+    Enable-WindowsOptionalFeature –online –featurename IIS-WebServerRole
+
+    refreshenv
+    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $false
+    Remove-Item $slnPath\src\PartsUnlimitedWebsite\node_modules -Force -Recurse
+    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $true
+} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+
+
+#A few more settings that I like but are not required for the PartsUnlimitedHOL
+# Show file extensions (have to restart Explorer for this to take effect if run maually - Stop-Process -processName: Explorer -force)
+Invoke-Command -ScriptBlock {Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideFileExt -Value "0"} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+
+
+Disable-PSRemoting -Force
+
