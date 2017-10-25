@@ -1,19 +1,19 @@
 Param(
-    [Parameter(Mandatory=$true)][string]$chocoPackages,
-    [Parameter(Mandatory=$true)][string]$vmAdminUserName,
-    [Parameter(Mandatory=$true)][string]$vmAdminPassword
+    [Parameter(Mandatory=$true)][string]$ChocoPackages,
+    [Parameter(Mandatory=$true)][string]$VmAdminUserName,
+    [Parameter(Mandatory=$true)][string]$VmAdminPassword
     )
 
 cls
 
 New-Item "c:\choco" -type Directory -force | Out-Null
 $LogFile = "c:\choco\Script.log"
-$chocoPackages | Out-File $LogFile -Append
-$vmAdminUserName | Out-File $LogFile -Append
-$vmAdminPassword | Out-File $LogFile -Append
+$ChocoPackages | Out-File $LogFile -Append
+$VmAdminUserName | Out-File $LogFile -Append
+$VmAdminPassword | Out-File $LogFile -Append
 
-$secPassword = ConvertTo-SecureString $vmAdminPassword -AsPlainText -Force		
-$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($vmAdminUserName)", $secPassword)
+$secPassword = ConvertTo-SecureString $VmAdminPassword -AsPlainText -Force		
+$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($VmAdminUserName)", $secPassword)
 
 # Ensure that current process can run scripts. 
 #"Enabling remoting" | Out-File $LogFile -Append
@@ -23,13 +23,13 @@ Enable-PSRemoting -Force -SkipNetworkProfileCheck
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
 #"Install each Chocolatey Package"
-$chocoPackages.Split(";") | ForEach {
+$ChocoPackages.Split(";") | ForEach {
     $command = "cinst " + $_ + " -y -force"
     $command | Out-File $LogFile -Append
     $sb = [scriptblock]::Create("$command")
 
     # Use the current user profile
-    Invoke-Command -ScriptBlock $sb -ArgumentList $chocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
+    Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 }
 
 $AddedLocation ="$env:userprofile\AppData\Roaming\npm"
@@ -37,7 +37,7 @@ $Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environm
 $OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
 "OldPath: $OldPath" | Out-File $LogFile -Append
 $NewPath= $OldPath + ';' + $AddedLocation
-Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath
+Invoke-Command -ScriptBlock {Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 $UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
 "UpdatedPath: $UpdatedPath" | Out-File $LogFile -Append
 
