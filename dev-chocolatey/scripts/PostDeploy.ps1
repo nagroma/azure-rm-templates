@@ -16,10 +16,10 @@ $secPassword = ConvertTo-SecureString $VmAdminPassword -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($VmAdminUserName)", $secPassword)
 
 # Ensure that current process can run scripts. 
-#"Enabling remoting" | Out-File $LogFile -Append
+"Enabling remoting" | Out-File $LogFile -Append
 Enable-PSRemoting -Force -SkipNetworkProfileCheck
 
-#"Changing ExecutionPolicy" | Out-File $LogFile -Append
+"Changing ExecutionPolicy" | Out-File $LogFile -Append
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
 #"Install each Chocolatey Package"
@@ -32,21 +32,22 @@ $ChocoPackages.Split(";") | ForEach {
     Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 }
 
-$AddedLocation ="$env:userprofile\AppData\Roaming\npm"
-$Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment"
-$OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
-"OldPath: $OldPath" | Out-File $LogFile -Append
-$NewPath= $OldPath + ';' + $AddedLocation
-Invoke-Command -ScriptBlock {Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-$UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
-"UpdatedPath: $UpdatedPath" | Out-File $LogFile -Append
-
+"Adding $env:userprofile\AppData\Roaming\npm to path" | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {
+    $AddedLocation ="$env:userprofile\AppData\Roaming\npm"
+    $Reg = "Registry::HKLM\System\CurrentControlSet\Control\Session Manager\Environment"
+    $OldPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
+    "OldPath: $OldPath" | Out-File $LogFile -Append
+    $NewPath= $OldPath + ';' + $AddedLocation
+    Set-ItemProperty -Path "$Reg" -Name PATH -Value $NewPath
+    $UpdatedPath = (Get-ItemProperty -Path "$Reg" -Name PATH).Path
+    "UpdatedPath: $UpdatedPath" | Out-File $LogFile -Append
+} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 $slnPath = "C:\PartsUnlimitedHOL"
 
 Invoke-Command -ScriptBlock {refreshenv} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {npm install bower -g} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {npm install grunt-cli -g} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-Invoke-Command -ScriptBlock {npm install -g grunt-cli} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {Copy-Item C:\Python27\python.exe C:\Python27\python2.exe} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {New-Item $slnPath -type directory -force} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 Invoke-Command -ScriptBlock {CD $slnPath} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
@@ -57,11 +58,11 @@ Invoke-Command -ScriptBlock {git clone https://github.com/Microsoft/PartsUnlimit
 # Show file extensions (have to restart Explorer for this to take effect if run maually - Stop-Process -processName: Explorer -force)
 Invoke-Command -ScriptBlock {Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideFileExt -Value "0"} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 
-Invoke-Command -ScriptBlock {buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $false} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
-
-Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse
-
-Invoke-Command -ScriptBlock {buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $true} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {
+    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $false
+    Remove-Item .\PartsUnlimited\src\PartsUnlimitedWebsite\node_modules -Force -Recurse
+    buildVS "$slnPath\PartsUnlimited.sln" -nuget $true -clean $true
+} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 
 Disable-PSRemoting -Force
 
