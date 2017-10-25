@@ -1,6 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
 param([Parameter(Mandatory=$true)][string]$vmAdminUserName)
-param([Parameter(Mandatory=$true)][SecureString]$vmAdminPassword)
+param([Parameter(Mandatory=$true)][string]$vmAdminPassword)
 
 cls
 
@@ -10,7 +10,8 @@ $chocoPackages | Out-File $LogFile -Append
 $vmAdminUserName | Out-File $LogFile -Append
 $vmAdminPassword | Out-File $LogFile -Append
 
-$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($vmAdminUserName)", $vmAdminPassword)
+$secPassword = ConvertTo-SecureString $vmAdminPassword -AsPlainText -Force		
+$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($vmAdminUserName)", $secPassword)
 
 # Ensure that current process can run scripts. 
 #"Enabling remoting" | Out-File $LogFile -Append
