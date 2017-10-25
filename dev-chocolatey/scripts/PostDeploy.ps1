@@ -1,6 +1,6 @@
-params(
-    [Parameter(Mandatory=$true)][string]$chocoPackages),
-    [Parameter(Mandatory=$true)][string]$vmAdminUserName),
+Param(
+    [Parameter(Mandatory=$true)][string]$chocoPackages,
+    [Parameter(Mandatory=$true)][string]$vmAdminUserName,
     [Parameter(Mandatory=$true)][string]$vmAdminPassword
     )
 
