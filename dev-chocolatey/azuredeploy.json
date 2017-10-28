@@ -70,7 +70,7 @@
     },
     "chocoPackages": {
       "type": "string",
-      "defaultValue": "nodejs;python2;visualstudiocode;notepadplusplus;googlechrome",
+      "defaultValue": "nodejs-lts;python2;visualstudiocode;notepadplusplus;googlechrome",
       "metadata": {
         "description": "List of Chocolatey packages to install separated by a semi-colon eg. linqpad;sysinternals"
       }
