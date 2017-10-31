@@ -38,7 +38,7 @@
       "metadata": {
         "description": "Desired Size of the VM. Any valid option accepted but if you choose premium storage type you must choose a DS class VM size."
       },
-      "defaultValue": "Standard_DS2"
+      "defaultValue": "Standard_D2s_v3"
     },
     "vmVisualStudioVersion": {
       "type": "string",
@@ -70,7 +70,7 @@
     },
     "chocoPackages": {
       "type": "string",
-      "defaultValue": "nodejs-lts;dotnetcore --version 1.1.2;python2;visualstudiocode;notepadplusplus;googlechrome",
+      "defaultValue": "nodejs-lts;python2;visualstudiocode;notepadplusplus;googlechrome;dotnetcore --version 1.1.2",
       "metadata": {
         "description": "List of Chocolatey packages to install separated by a semi-colon eg. linqpad;sysinternals"
       }
