@@ -70,9 +70,9 @@
     },
     "chocoPackages": {
       "type": "string",
-      "defaultValue": "nodejs-lts;python2;visualstudiocode;notepadplusplus;googlechrome;dotnetcore --version 1.1.2",
+      "defaultValue": "",
       "metadata": {
-        "description": "List of Chocolatey packages to install separated by a semi-colon eg. linqpad;sysinternals"
+        "description": "List of Chocolatey packages to install separated by a semi-colon eg. nodejs-lts;python2;visualstudiocode;notepadplusplus;googlechrome;dotnetcore --version 1.1.2"
       }
     },
     "setupChocolateyScriptFileName": {
@@ -98,10 +98,10 @@
       "vmImagePublisher": "MicrosoftVisualStudio",
       "vmImageOffer": "VisualStudio",
       "vmOSDiskName": "VMOSDisk",
-      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'Vnet01')]",
+      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('VMName'), '-net'))]",
       "vmSubnetRef": "[concat(variables('VMVnetID'), '/subnets/', variables('Vnet01Subnet1Name'))]",
       "vmStorageAccountContainerName": "vhds",
-      "vmNicName": "[concat(parameters('VMName'), '-net')]",
+      "vmNicName": "[concat(parameters('VMName'), '-nic')]",
       "vmIP01Name": "[concat(parameters('VMName'), '-ip')]"
     },
     "resources": [
@@ -247,9 +247,6 @@
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-06-15",
         "dependsOn": [ ],
-        "tags": {
-          "displayName": "VMIP01"
-        },
         "properties": {
           "publicIPAllocationMethod": "Dynamic",
           "dnsSettings": {
