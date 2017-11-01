@@ -91,7 +91,7 @@
     }
   },
     "variables": {
-      "storageName": "['stor', concat(uniquestring(resourceGroup().id))]",
+      "storageName": "[concat('stor', uniquestring(resourceGroup().id))]",
       "vnet01Prefix": "10.0.0.0/16",
       "vnet01Subnet1Name": "Subnet-1",
       "vnet01Subnet1Prefix": "10.0.0.0/24",
