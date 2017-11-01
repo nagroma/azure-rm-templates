@@ -34,11 +34,11 @@ Enable-PSRemoting -Force -SkipNetworkProfileCheck
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
 # Install Choco
-#"Installing Chocolatey" | Out-File $LogFile -Append
+"Installing Chocolatey" | Out-File $LogFile -Append
 $sb = { iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')) }
 Invoke-Command -ScriptBlock $sb -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 
-#"Disabling UAC" | Out-File $LogFile -Append
+"Disabling UAC" | Out-File $LogFile -Append
 $sb = { Set-ItemProperty -path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System -name EnableLua -value 0 }
 Invoke-Command -ScriptBlock $sb -ComputerName $env:COMPUTERNAME -Credential $credential
 
@@ -48,6 +48,7 @@ $chocoPackages.Split(";") | ForEach {
     $command | Out-File $LogFile -Append
     $sb = [scriptblock]::Create("$command")
 
+    "Installing $_" | Out-File $LogFile -Append
     # Use the current user profile
     Invoke-Command -ScriptBlock $sb -ArgumentList $chocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
 }
