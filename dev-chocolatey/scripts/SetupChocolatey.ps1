@@ -1,9 +1,9 @@
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
 cls
 
-#New-Item "c:\jdchoco" -type Directory -force | Out-Null
-#$LogFile = "c:\jdchoco\JDScript.log"
-#$chocoPackages | Out-File $LogFile -Append
+New-Item "c:\choco" -type Directory -force | Out-Null
+$LogFile = "c:\choco\Script.log"
+$chocoPackages | Out-File $LogFile -Append
 
 # Get username/password & machine name
 $userName = "artifactInstaller"
