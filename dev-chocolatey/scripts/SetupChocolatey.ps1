@@ -1,7 +1,8 @@
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
+Write-Output $chocoPackages
 cls
 
-New-Item "c:\choco" -type Directory -force | Out-Null
+New-Item "c:\choco" -type Directory -force | Write-Output
 $LogFile = "c:\choco\Script.log"
 $chocoPackages | Out-File $LogFile -Append
 
@@ -27,7 +28,8 @@ $secPassword = ConvertTo-SecureString $password -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($username)", $secPassword)
 
 # Ensure that current process can run scripts. 
-#"Enabling remoting" | Out-File $LogFile -Append
+"Enabling remoting" | Write-Output
+"Enabling remoting" | Out-File $LogFile -Append
 Enable-PSRemoting -Force -SkipNetworkProfileCheck
 
 #"Changing ExecutionPolicy" | Out-File $LogFile -Append
