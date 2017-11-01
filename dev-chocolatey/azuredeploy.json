@@ -147,7 +147,7 @@
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-06-15",
         "dependsOn": [
-          "[concat('Microsoft.Network/virtualNetworks/', '[variables('vmVnetName')]')]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('vmVnetName'))]",
           "[concat('Microsoft.Network/publicIPAddresses/', variables('vmIP01Name'))]"
         ],
         "properties": {
