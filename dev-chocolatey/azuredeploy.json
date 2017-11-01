@@ -15,7 +15,7 @@
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "andrewmo-choco",
+      "defaultValue": "VSVM-choco",
       "metadata": {
         "description": "Local name for the VM can be whatever you want"
       }
@@ -65,7 +65,7 @@
       "type": "string",
       "defaultValue": "andrewmo-choco",
       "metadata": {
-      "description": "DNS Label for the Public IP. Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
+      "description": "DNS Label for the unique Public IP. Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
       }
     },
     "chocoPackages": {
@@ -91,7 +91,7 @@
     }
   },
     "variables": {
-      "storageName": "[concat(uniquestring(resourceGroup().id), '-storage')]",
+      "storageName": "['stor', concat(uniquestring(resourceGroup().id))]",
       "vnet01Prefix": "10.0.0.0/16",
       "vnet01Subnet1Name": "Subnet-1",
       "vnet01Subnet1Prefix": "10.0.0.0/24",
