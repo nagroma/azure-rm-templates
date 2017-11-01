@@ -98,7 +98,8 @@
       "vmImagePublisher": "MicrosoftVisualStudio",
       "vmImageOffer": "VisualStudio",
       "vmOSDiskName": "VMOSDisk",
-      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', 'VNetO1')]",
+      "vmVnetName": "[concat(parameters('VMName'), '-net')]",
+      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vmVnetName'))]",
       "vmSubnetRef": "[concat(variables('vmVnetID'), '/subnets/', variables('Vnet01Subnet1Name'))]",
       "vmStorageAccountContainerName": "vhds",
       "vmNicName": "[concat(parameters('vmName'), '-nic')]",
@@ -119,7 +120,7 @@
         }
       },
       {
-        "name": "VNetO1",
+        "name": "[variables('vmVnetName')]",
         "type": "Microsoft.Network/virtualNetworks",
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-06-15",
