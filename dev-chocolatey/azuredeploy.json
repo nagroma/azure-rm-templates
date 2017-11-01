@@ -98,7 +98,7 @@
       "vmImagePublisher": "MicrosoftVisualStudio",
       "vmImageOffer": "VisualStudio",
       "vmOSDiskName": "VMOSDisk",
-      "vmVnetName": "[concat(parameters('VMName'), '-net')]",
+      "vmVnetName": "[concat(parameters('VMName'), 'net')]",
       "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vmVnetName'))]",
       "vmSubnetRef": "[concat(variables('VMVnetID'), '/subnets/', variables('Vnet01Subnet1Name'))]",
       "vmStorageAccountContainerName": "vhds",
