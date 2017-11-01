@@ -98,7 +98,8 @@
       "vmImagePublisher": "MicrosoftVisualStudio",
       "vmImageOffer": "VisualStudio",
       "vmOSDiskName": "VMOSDisk",
-      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('VMName'), '-net'))]",
+      "vmVnetName": "[concat(parameters('VMName'), '-net'))]",
+      "vmVnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('vmVnetName')]",
       "vmSubnetRef": "[concat(variables('VMVnetID'), '/subnets/', variables('Vnet01Subnet1Name'))]",
       "vmStorageAccountContainerName": "vhds",
       "vmNicName": "[concat(parameters('VMName'), '-nic')]",
@@ -119,14 +120,11 @@
         }
       },
       {
-        "name": "VNet01",
+        "name": "[variables('vmVnetName')]",
         "type": "Microsoft.Network/virtualNetworks",
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-06-15",
         "dependsOn": [ ],
-        "tags": {
-          "displayName": "VNet01"
-        },
         "properties": {
           "addressSpace": {
             "addressPrefixes": [
@@ -149,12 +147,9 @@
         "location": "[resourceGroup().location]",
         "apiVersion": "2015-06-15",
         "dependsOn": [
-          "[concat('Microsoft.Network/virtualNetworks/', 'Vnet01')]",
+          "[concat('Microsoft.Network/virtualNetworks/', '[variables('vmVnetName')]')]",
           "[concat('Microsoft.Network/publicIPAddresses/', variables('vmIP01Name'))]"
         ],
-        "tags": {
-          "displayName": "VMNic01"
-        },
         "properties": {
           "ipConfigurations": [
             {
@@ -181,9 +176,6 @@
           "[concat('Microsoft.Storage/storageAccounts/', variables('storageName'))]",
           "[concat('Microsoft.Network/networkInterfaces/', variables('vmNicName'))]"
         ],
-        "tags": {
-          "displayName": "VM01"
-        },
         "properties": {
           "hardwareProfile": {
             "vmSize": "[parameters('vmSize')]"
