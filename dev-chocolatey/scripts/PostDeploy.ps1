@@ -54,15 +54,16 @@ Enable-PSRemoting -Force -SkipNetworkProfileCheck
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
 #"Install each Chocolatey Package"
-$ChocoPackages.Split(";") | ForEach {
-    $command = "cinst " + $_ + " -y -force"
-    $command | Out-File $LogFile -Append
-    $sb = [scriptblock]::Create("$command")
+if (-not [String]::IsNullOrWhiteSpace($ChocoPackages)){
+    $ChocoPackages.Split(";") | ForEach {
+        $command = "cinst " + $_ + " -y -force"
+        $command | Out-File $LogFile -Append
+        $sb = [scriptblock]::Create("$command")
 
-    # Use the current user profile
-    Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
+        # Use the current user profile
+        Invoke-Command -ScriptBlock $sb -ArgumentList $ChocoPackages -ComputerName $env:COMPUTERNAME -Credential $credential | Out-Null
+    }
 }
-
 
 Invoke-Command -ScriptBlock {
     $slnPath = "$env:userprofile\Desktop\PartsUnlimitedHOL"
@@ -95,8 +96,12 @@ Invoke-Command -ScriptBlock {
 
 
 #A few more settings that I like but are not required for the PartsUnlimitedHOL
-# Show file extensions (have to restart Explorer for this to take effect if run maually - Stop-Process -processName: Explorer -force)
-Invoke-Command -ScriptBlock {Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideFileExt -Value "0"} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
+Invoke-Command -ScriptBlock {
+    # Show file extensions (have to restart Explorer for this to take effect if run maually - Stop-Process -processName: Explorer -force)
+    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideFileExt -Value "0"
+    
+    Set-TimeZone -Name "Eastern Standard Time"
+} -ComputerName $env:COMPUTERNAME -Credential $credential | Out-File $LogFile -Append
 
 
 Disable-PSRemoting -Force
