@@ -35,11 +35,11 @@
     },
     "virtualNetworkAddressPrefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/16"
+      "defaultValue": ["10.0.0.0/16"]
     },
     "virtualNetworkSubnetPrefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/24"
+      "defaultValue": ["10.0.0.0/24"]
     },
     "virtualMachineAdminUsername": {
       "type": "string"
